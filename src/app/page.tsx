@@ -34,7 +34,7 @@ export default function Home() {
               animation: "bark-animation 2s forwards",
             }}
           >
-            ¡Woof! ¡Woof!
+            ¡Woof! ¡Woof! ¡Woof!
           </h2>
         )}
 
