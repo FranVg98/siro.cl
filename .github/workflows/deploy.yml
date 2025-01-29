@@ -47,6 +47,6 @@ jobs:
             npm run build
 
             # Paso 5: Iniciar la aplicación
-            nohup npm start > output.log 2>&1 &
+            npm start & > output.log 2>&1 &
 
             echo "Despliegue completado."
