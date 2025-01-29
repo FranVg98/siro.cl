@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /ruta/de/tu/app
+            cd /home/siro/siro.cl/
 
             # Paso 1: Detener la aplicación
             PORT=3000
