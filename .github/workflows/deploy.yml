@@ -22,7 +22,7 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
             # Ejecutar el script sin ponerlo en segundo plano
-            bash /home/siro/siro.cl/deploy.sh | tee /home/siro/siro.cl/deploy.log
+            bash /home/siro/deploy.sh | tee /home/siro/deploy.log
 
             echo "Despliegue completado."
 
