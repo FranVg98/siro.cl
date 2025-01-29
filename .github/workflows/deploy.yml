@@ -21,5 +21,35 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
-            bash /home/siro/siro.cl/deploy.sh >> /tmp/deploy_output.log 2>&1
-            cat /tmp/deploy_output.log
+            cd /home/siro/siro.cl/
+
+            # Paso 1: Detener la aplicación
+            PORT=3000
+            PID=$(netstat -putna | grep :$PORT | awk '{print $7}' | cut -d'/' -f1)
+            
+            echo "PID encontrado: $PID"
+            
+            if [ ! -z "$PID" ]; then
+              echo "Deteniendo la aplicación en el puerto $PORT..."
+              kill -9 $PID
+            else
+              echo "No hay aplicación corriendo en el puerto $PORT."
+            fi
+            
+            # Paso 2: Actualizar código
+            echo "Actualizando código..."
+            git pull origin main
+            
+            # Paso 3: Instalar dependencias
+            echo "Instalando dependencias..."
+            npm install --omit=dev
+            
+            # Paso 4: Construir la aplicación
+            echo "Construyendo la aplicación..."
+            npm run build
+            
+            # Paso 5: Iniciar la aplicación en segundo plano
+            npm start &
+            
+            echo "Despliegue completado."
+
