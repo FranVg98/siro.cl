@@ -54,7 +54,7 @@ export default function Home() {
             marginTop: "1rem",
           }}
         >
-          Siro Siro
+          Siro
         </h1>
 
 
