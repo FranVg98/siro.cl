@@ -36,39 +36,34 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
         script: |
-          echo "Iniciando el despliegue..."
-            
-          cd /home/siro/siro.cl/
-            
           # Paso 1: Actualizar código
           echo "Actualizando código..."
           git pull origin main
-            
-          # Paso 2: Instalar dependencias
+          
+          # Paso 2: Asegurarse de usar la versión correcta de Node
+          . ~/.nvm/nvm.sh  # Cargar NVM si lo usas
+          nvm use 20  # Usar Node.js 20
+          
+          # Paso 3: Instalar dependencias
           echo "Instalando dependencias..."
           npm install --omit=dev
-            
-            
-          # Paso 3: Detener la aplicación
+          
+          # Paso 4: Gestionar proceso anterior
           PORT=3000
-            
-          # Verificar si hay algún proceso corriendo en el puerto usando netstat
-          PID=$(sudo netstat -putna | grep ":$PORT" | awk '{print $7}' | cut -d'/' -f1)
-            
+          PID=$(lsof -t -i:$PORT)
           if [ ! -z "$PID" ]; then
             echo "Deteniendo la aplicación en el puerto $PORT (PID: $PID)..."
-            kill -9 $PID
+            kill -9 $PID || true
           else
             echo "No hay aplicación corriendo en el puerto $PORT."
           fi
-            
-            
-          # Paso 4: Construir la aplicación
+          
+          # Paso 5: Construir la aplicación
           echo "Construyendo la aplicación..."
           npm run build
-            
-          # Paso 5: Iniciar la aplicación en segundo plano
+          
+          # Paso 6: Iniciar la aplicación con PM2 (recomendado)
           echo "Iniciando la aplicación..."
-          npm start &
-            
+          pm2 restart siro.cl || pm2 start npm --name "siro.cl" -- start
+          
           echo "Despliegue completado."
