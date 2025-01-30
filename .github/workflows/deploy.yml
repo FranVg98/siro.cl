@@ -31,8 +31,41 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
-            # Ejecutar el script sin ponerlo en segundo plano
-            bash /home/siro/deploy.sh | tee /home/siro/deploy.log
-
+            echo "Iniciando el despliegue..."
+            
+            cd /home/siro/siro.cl/
+            
+            # Paso 1: Actualizar código
+            echo "Actualizando código..."
+            git pull origin main
+            
+            # Paso 2: Instalar dependencias
+            echo "Instalando dependencias..."
+            npm install --omit=dev
+            
+            
+            # Paso 3: Detener la aplicación
+            PORT=3000
+            
+            # Verificar si hay algún proceso corriendo en el puerto usando netstat
+            PID=$(sudo netstat -putna | grep ":$PORT" | awk '{print $7}' | cut -d'/' -f1)
+            
+            if [ ! -z "$PID" ]; then
+              echo "Deteniendo la aplicación en el puerto $PORT (PID: $PID)..."
+              kill -9 $PID
+            else
+              echo "No hay aplicación corriendo en el puerto $PORT."
+            fi
+            
+            
+            # Paso 4: Construir la aplicación
+            echo "Construyendo la aplicación..."
+            npm run build
+            
+            # Paso 5: Iniciar la aplicación en segundo plano
+            echo "Iniciando la aplicación..."
+            npm start &
+            
             echo "Despliegue completado."
+
 
