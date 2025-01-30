@@ -1,0 +1,74 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+        script: |
+          echo "Iniciando el despliegue..."
+            
+          cd /home/siro/siro.cl/
+            
+          # Paso 1: Actualizar código
+          echo "Actualizando código..."
+          git pull origin main
+            
+          # Paso 2: Instalar dependencias
+          echo "Instalando dependencias..."
+          npm install --omit=dev
+            
+            
+          # Paso 3: Detener la aplicación
+          PORT=3000
+            
+          # Verificar si hay algún proceso corriendo en el puerto usando netstat
+          PID=$(sudo netstat -putna | grep ":$PORT" | awk '{print $7}' | cut -d'/' -f1)
+            
+          if [ ! -z "$PID" ]; then
+            echo "Deteniendo la aplicación en el puerto $PORT (PID: $PID)..."
+            kill -9 $PID
+          else
+            echo "No hay aplicación corriendo en el puerto $PORT."
+          fi
+            
+            
+          # Paso 4: Construir la aplicación
+          echo "Construyendo la aplicación..."
+          npm run build
+            
+          # Paso 5: Iniciar la aplicación en segundo plano
+          echo "Iniciando la aplicación..."
+          npm start &
+            
+          echo "Despliegue completado."
