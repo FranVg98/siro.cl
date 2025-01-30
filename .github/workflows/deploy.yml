@@ -13,6 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Verificar versión de Node.js
+        run: |
+          echo "Versión de Node.js:"
+          node -v
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
