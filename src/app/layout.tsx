@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Head from "next/head";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +25,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-       <Head>
+      <>
         {/* Google Analytics */}
-        <script
-          async
+        <Script
+          strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=G-8VM372KS1G"
-        ></script>
-        <script
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -41,7 +43,7 @@ export default function RootLayout({
             `,
           }}
         />
-      </Head>
+      </>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>
