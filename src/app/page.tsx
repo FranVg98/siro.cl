@@ -43,7 +43,7 @@ export default function Home() {
           alt="Perro"
           width={450}
           height={455}
-          priority
+          priority = {true}
           style={{ borderRadius: "3%", cursor: "pointer" }}
           onClick={handleImageClick} // Evento de clic en la imagen
         />
