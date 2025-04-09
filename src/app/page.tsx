@@ -14,9 +14,9 @@ export default function Home() {
 
   // Efecto para agregar el event listener del teclado
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === "r" || event.key === "R") {
-        setShowGif(true);
+      setShowGif(true);
       }
     };
 
